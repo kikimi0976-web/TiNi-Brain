@@ -13,7 +13,7 @@ app = FastAPI()
 # CẤU HÌNH NGƯỜI DÙNG (BẠN CHỈ CẦN SỬA CHỖ NÀY)
 # Dán link WSS bạn lấy được từ trang xiaozhi.me vào giữa dấu ngoặc kép bên dưới
 # Ví dụ: MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJIUz..."
-MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NjgxNzUxLCJleHAiOjE3OTgyMzkzNTF9.tLpDJEc00WldOZ18XxHaTAFyAqit3uXWNlzdc5kWCtG2dN-iCWANR3fFwuunTDTmX_DT6To3DW4a-6alj_89ig"
+MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NjgzODU3LCJleHAiOjE3OTgyNDE0NTd9.p9WaiQzusMWmLsz77rt4c80Rj95hJc9HbuH0bCn1PVM5M8xvDFkhywOLUeLHMQH1p3PS7K24OsmnVoHC87poHw"
 # ==============================================================================
 
 # --- HÀM HỖ TRỢ: LẤY LINK YOUTUBE ---
@@ -121,7 +121,11 @@ def run_websocket():
                                 on_message=on_message,
                                 on_error=on_error,
                                 on_close=on_close)
-    ws.run_forever()
+    
+    # --- DÒNG QUAN TRỌNG NHẤT Ở DƯỚI ĐÂY ---
+    # ping_interval=30: Cứ 30 giây gửi tín hiệu "Tôi còn sống" một lần
+    # ping_timeout=10: Nếu server không trả lời trong 10 giây thì tự kết nối lại
+    ws.run_forever(ping_interval=30, ping_timeout=10)
 
 def start_websocket_thread():
     t = threading.Thread(target=run_websocket)
