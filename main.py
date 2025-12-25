@@ -169,7 +169,10 @@ def start_background_service():
 @app.get("/")
 def keep_alive():
     return {"status": "Robot Brain is Running"}
-
+# --- Thêm đoạn này vào dưới hàm keep_alive ---
+@app.head("/")
+def keep_alive_head():
+    return {"status": "OK"}
 # Tự động chạy khi khởi động
 @app.on_event("startup")
 async def startup_event():
