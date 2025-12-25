@@ -14,7 +14,7 @@ app = FastAPI()
 # Lưu ý: Token thường hết hạn sau 24h hoặc khi bị spam kết nối. 
 # Nếu lỗi đỏ, hãy vào xiaozhi.me lấy token mới.
 # ==============================================================================
-MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2Njg4NDExLCJleHAiOjE3OTgyNDYwMTF9.svN02YbccPJU2xrPcpFjfIH5N2mUa-5HiCdFx7stFvRIO5g1f9prPWKoRuYBv-JgYv8wehvv0qq8ccr4xQd66Q"
+MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2Njg5MzE1LCJleHAiOjE3OTgyNDY5MTV9.DFcMDjJcIysAJE_OZ8tVbZ1V4LTvYvkzmWsTjtJoxQ7yc1kVuRh1YnZ0vJ4yHeiQ8UzaDGx_RFqUN7qPbF2e9A"
 
 
 # --- HÀM 1: TÌM NHẠC THÔNG MINH (CHỐNG CHẶN IP) ---
