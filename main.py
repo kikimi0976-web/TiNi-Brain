@@ -13,7 +13,7 @@ app = FastAPI()
 # CẤU HÌNH NGƯỜI DÙNG (BẠN CHỈ CẦN SỬA CHỖ NÀY)
 # Dán link WSS bạn lấy được từ trang xiaozhi.me vào giữa dấu ngoặc kép bên dưới
 # Ví dụ: MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJIUz..."
-MCP_ENDPOINT = "DÁN_LINK_WSS_CỦA_BẠN_VÀO_ĐÂY" 
+MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NjgxMDEwLCJleHAiOjE3OTgyMzg2MTB9.bZE5aBqDhNIl_Lgae5LvCRiuzcZhTjTmC1wJGWJgpfrso2_jr5kPce9q6MXXnzUtABk4TXKnsyH-gJiUlBaHUA"
 # ==============================================================================
 
 # --- HÀM HỖ TRỢ: LẤY LINK YOUTUBE ---
