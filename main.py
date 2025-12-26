@@ -11,7 +11,7 @@ import yt_dlp
 app = FastAPI()
 
 # URL kết nối từ phía Robot
-MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=YOUR_TOKEN_HERE"
+MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NzY4MjU3LCJleHAiOjE3OTgzMjU4NTd9.p92b9mHiYlETDrPBXY8yhuqHVvZ6EG8Y9b4-83BOMZ_mtrkXdv9d7MEe_3Szr02wKLqnwxWfFEJF2_WOzvcQjA"
 
 # --- [TOOLS] CÔNG CỤ TÌM KIẾM TIN TỨC ---
 def tool_web_search(query):
