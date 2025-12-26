@@ -125,7 +125,16 @@ def on_message(ws, message):
 
 def on_error(ws, error): print(f"[WS Error]: {error}")
 def on_close(ws, status, msg): print(">>> Mất kết nối. Đang chờ thử lại...")
-def on_open(ws): print("\n" + "="*40 + "\n>>> KẾT NỐI THÀNH CÔNG! TRUMAN BRAIN ONLINE <<<\n" + "="*40 + "\n")
+def on_open(ws):
+    print("\n>>> KẾT NỐI THÀNH CÔNG! ĐANG KÍCH HOẠT BỘ NÃO...")
+    # Gửi gói tin mồi nhử để khai báo tính năng với Cloud
+    init_msg = {
+        "type": "init",
+        "version": "1.0",
+        "capabilities": ["audio_stream", "text_search"]
+    }
+    ws.send(json.dumps(init_msg))
+    print(">>> ĐÃ GỬI TÍN HIỆU KHAI BÁO TÍNH NĂNG! <<<")
 
 def run_ws_loop():
     while True:
