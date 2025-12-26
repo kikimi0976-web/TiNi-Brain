@@ -105,7 +105,7 @@ def run_ws():
     while True:
         try:
             ws = websocket.WebSocketApp(MCP_ENDPOINT, on_open=on_open, on_message=on_message)
-            ws.run_forever(ping_interval=20, ping_timeout=10)
+            ws.run_forever()
         except: time.sleep(5)
 
 @app.get("/")
