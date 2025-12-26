@@ -41,16 +41,35 @@ def tool_play_music(song_name):
 # --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ (MCP) ---
 def on_message(ws, message):
     try:
-        print(f"\n[DỮ LIỆU NHẬN ĐƯỢC]: {message}", flush=True)
         data = json.loads(message)
         method = data.get("method")
-        msg_id = data.get("id") or data.get("message_id")
+        # Lấy ID từ chính gói tin Robot gửi đến
+        msg_id = data.get("id") if data.get("id") is not None else data.get("message_id")
 
-        # 1. PHẢN HỒI PING (Sửa lỗi ngắt kết nối 30 giây)
-        if method == "ping":
-            ws.send(json.dumps({"id": msg_id, "jsonrpc": "2.0", "result": {}}))
-            print(">>> [PONG] Đã phản hồi nhịp đập của Robot!", flush=True)
+        # XỬ LÝ LỆNH KHỞI TẠO TỪ ROBOT
+        if method == "initialize":
+            reply = {
+                "id": msg_id, # Phải trả về đúng ID Robot vừa gửi (ví dụ: 0)
+                "jsonrpc": "2.0",
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {
+                            "listChanged": True,
+                            "tools": [
+                                {"name": "web_search", "description": "Tìm kiếm tin tức trực tuyến"},
+                                {"name": "play_music", "description": "Phát nhạc YouTube"}
+                            ]
+                        }
+                    },
+                    "serverInfo": {"name": "Truman-Brain", "version": "1.0"}
+                }
+            }
+            ws.send(json.dumps(reply))
+            print(f">>> [SUCCESS] Đã xác nhận khởi tạo gói ID: {msg_id}", flush=True)
             return
+
+        # Các đoạn xử lý ping và call_tool bên dưới giữ nguyên...
 
         # 1. XỬ LÝ KHỞI TẠO - Bước quan trọng để sửa lỗi "Unknown tool"
         if method == "initialize":
@@ -94,12 +113,8 @@ def on_message(ws, message):
     except Exception as e: print(f"!! Lỗi: {str(e)}", flush=True)
 
 def on_open(ws):
-    print(">>> KẾT NỐI THÀNH CÔNG! ĐANG KHAI BÁO...", flush=True)
-    init_msg = {"type": "init", "capabilities": {"tools": [
-        {"name": "web_search", "description": "Tìm tin tức"},
-        {"name": "play_music", "description": "Phát nhạc"}
-    ]}}
-    ws.send(json.dumps(init_msg))
+    # Chỉ in log để biết đã thông mạng, KHÔNG gửi gì thêm tại đây
+    print(">>> ĐÃ MỞ KẾT NỐI. ĐỢI ROBOT GỬI LỆNH KHỞI TẠO...", flush=True)
 
 def run_ws():
     while True:
