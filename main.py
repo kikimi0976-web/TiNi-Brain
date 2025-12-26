@@ -42,31 +42,55 @@ def tool_play_music(song_name):
 # --- [CORE] BỘ ĐIỀU PHỐI LỆNH (DISPATCHER) ---
 def on_message(ws, message):
     try:
-        print(f"\n[DỮ LIỆU THÔ]: {message}", flush=True) # Hiện log ngay lập tức
+        # 1. Ép in log thô để theo dõi trên Render
+        print(f"\n[DỮ LIỆU NHẬN ĐƯỢC]: {message}", flush=True)
+        
         data = json.loads(message)
         
-        # Chỉ xử lý nếu Robot yêu cầu gọi Tool (JSON-RPC)
+        # 2. Kiểm tra xem Robot có yêu cầu gọi công cụ (call_tool) không
         if data.get("type") == "call_tool":
             tool_name = data.get("name")
-            args = data.get("arguments", {})
-            msg_id = data.get("message_id")
+            arguments = data.get("arguments", {})
+            message_id = data.get("message_id") # Cần ID để Robot biết phản hồi này cho lệnh nào
 
+            print(f">>> [DISPATCHER] Robot yêu cầu dùng: {tool_name}", flush=True)
+
+            # 3. Điều phối đến công cụ Tìm kiếm (Bước 3)
             if tool_name == "web_search":
-                result = tool_web_search(args.get("query"))
-                reply = {"type": "tool_result", "message_id": msg_id, "data": {"text": result}}
+                query = arguments.get("query")
+                search_result = tool_web_search(query) # Gọi hàm từ Bước 3
+                
+                # Gửi kết quả về cho AI tóm tắt
+                reply = {
+                    "type": "tool_result",
+                    "message_id": message_id,
+                    "data": {"text": search_result}
+                }
                 ws.send(json.dumps(reply))
-            
+
+            # 4. Điều phối đến công cụ Phát nhạc (Bước 4)
             elif tool_name == "play_music":
-                res = tool_play_music(args.get("query"))
-                if isinstance(res, dict):
-                    reply = {"type": "tool_result", "message_id": msg_id, 
-                             "data": {"type": "audio", "url": res['url'], "text": f"Đang phát: {res['title']}"}}
+                song_query = arguments.get("query")
+                music_res = tool_play_music(song_query) # Gọi hàm từ Bước 4
+                
+                if isinstance(music_res, dict):
+                    # Trả về link audio để Robot phát ngay lập tức
+                    reply = {
+                        "type": "tool_result",
+                        "message_id": message_id,
+                        "data": {
+                            "type": "audio",
+                            "url": music_res['url'],
+                            "text": f"Đang mở bài: {music_res['title']}"
+                        }
+                    }
                 else:
-                    reply = {"type": "tool_result", "message_id": msg_id, "data": {"text": res}}
+                    reply = {"type": "tool_result", "message_id": message_id, "data": {"text": music_res}}
+                
                 ws.send(json.dumps(reply))
 
     except Exception as e:
-        print(f"[Error]: {str(e)}", flush=True)
+        print(f"!! Lỗi điều phối lệnh: {str(e)}", flush=True)
 
 def on_open(ws):
     print(">>> KẾT NỐI THÀNH CÔNG! KHAI BÁO TÍNH NĂNG...", flush=True)
