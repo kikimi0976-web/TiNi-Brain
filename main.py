@@ -49,47 +49,45 @@ def on_message(ws, message):
         # 1. PHẢN HỒI PING (GIỮ KẾT NỐI)
         if method == "ping":
             ws.send(json.dumps({"id": msg_id, "jsonrpc": "2.0", "result": {}}))
-            print(f">>> [PONG] Đã phản hồi nhịp đập cho ID: {msg_id}", flush=True)
+            print(f">>> [PONG] Đã phản hồi nhịp đập ID: {msg_id}", flush=True)
             return
 
-        # 2. PHẢN HỒI INITIALIZE (XÁC NHẬN GIAO THỨC)
+        # 2. XỬ LÝ THÔNG BÁO HOÀN TẤT KHỞI TẠO (SỬA LỖI VÒNG LẶP 60S)
+        if method == "notifications/initialized":
+            print(">>> [READY] Handshake hoàn tất! Robot đã sẵn sàng.", flush=True)
+            # Gửi một gói tin trống để "chào" Robot và reset timer của Render
+            ws.send(json.dumps({"jsonrpc": "2.0", "method": "notifications/ready", "params": {}}))
+            return
+
+        # 3. PHẢN HỒI INITIALIZE (KHAI BÁO NĂNG LỰC)
         if method == "initialize":
             reply = {"id": msg_id, "jsonrpc": "2.0", "result": {
                 "protocolVersion": "2024-11-05",
-                "capabilities": {"tools": {}}, # Khai báo có hỗ trợ công cụ
+                "capabilities": {"tools": {}, "logging": {}}, 
                 "serverInfo": {"name": "Truman-Brain", "version": "1.0"}
             }}
             ws.send(json.dumps(reply))
-            print(f">>> [INIT OK] Đã xác nhận khởi tạo cho ID: {msg_id}", flush=True)
+            print(f">>> [INIT OK] Phản hồi ID: {msg_id}", flush=True)
             return
 
-        # 3. PHẢN HỒI TOOLS/LIST (BẮT BUỘC PHẢI CÓ INPUTSCHEMA)
+        # 4. PHẢN HỒI TOOLS/LIST (DÙNG SCHEMA BẠN ĐÃ CẬP NHẬT)
         if method == "tools/list":
             reply = {"id": msg_id, "jsonrpc": "2.0", "result": {"tools": [
                 {
-                    "name": "web_search",
-                    "description": "Tìm kiếm tin tức và thông tin trên internet",
-                    "inputSchema": { # AI dựa vào đây để biết cách đặt câu hỏi
-                        "type": "object",
-                        "properties": {"query": {"type": "string", "description": "Từ khóa tìm kiếm"}},
-                        "required": ["query"]
-                    }
+                    "name": "web_search", "description": "Tìm kiếm tin tức trực tuyến",
+                    "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}
                 },
                 {
-                    "name": "play_music",
-                    "description": "Tìm và phát nhạc từ YouTube",
-                    "inputSchema": {
-                        "type": "object",
-                        "properties": {"query": {"type": "string", "description": "Tên bài hát hoặc ca sĩ"}},
-                        "required": ["query"]
-                    }
+                    "name": "play_music", "description": "Tìm và phát nhạc YouTube",
+                    "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]}
                 }
             ]}}
             ws.send(json.dumps(reply))
-            print(f">>> [LIST OK] Đã gửi danh sách công cụ cho ID: {msg_id}", flush=True)
+            print(f">>> [LIST OK] Đã gửi danh sách cho ID: {msg_id}", flush=True)
             return
 
-    except Exception as e: print(f"!! Lỗi xử lý: {str(e)}", flush=True)
+    except Exception as e:
+        print(f"!! Lỗi: {str(e)}", flush=True)
 
 def on_open(ws):
     # Chỉ in log để biết đã thông mạng, KHÔNG gửi gì thêm tại đây
