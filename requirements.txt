@@ -1,7 +1,5 @@
 fastapi
 uvicorn
-duckduckgo-search
-requests
-yt_dlp
-ffmpeg
 websocket-client
+yt-dlp
+duckduckgo-search
