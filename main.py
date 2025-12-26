@@ -43,13 +43,14 @@ def tool_play_music(song_name):
 # --- [CORE] BỘ ĐIỀU PHỐI LỆNH (MCP DISPATCHER) ---
 def on_message(ws, message):
     try:
+        # 1. In log thô để theo dõi trên Render
         print(f"\n[DỮ LIỆU NHẬN ĐƯỢC]: {message}", flush=True)
+        
         data = json.loads(message)
         method = data.get("method")
         msg_id = data.get("id") or data.get("message_id")
 
-        # A. Xử lý yêu cầu khởi tạo (Initialize) - CỰC KỲ QUAN TRỌNG
-        # A. Xử lý yêu cầu khởi tạo (Initialize)
+        # A. XỬ LÝ KHỞI TẠO (Bắt buộc phải có để đăng ký Tool)
         if method == "initialize":
             reply = {
                 "id": msg_id,
@@ -59,10 +60,9 @@ def on_message(ws, message):
                     "capabilities": {
                         "tools": {
                             "listChanged": True,
-                            # KHAI BÁO CÔNG CỤ TẠI ĐÂY ĐỂ ROBOT NHẬN DIỆN
                             "tools": [
                                 {"name": "web_search", "description": "Tìm kiếm tin tức trực tuyến"},
-                                {"name": "play_music", "description": "Phát nhạc từ YouTube"}
+                                {"name": "play_music", "description": "Tìm và phát nhạc YouTube"}
                             ]
                         }
                     },
@@ -70,25 +70,35 @@ def on_message(ws, message):
                 }
             }
             ws.send(json.dumps(reply))
-            print(">>> [XÁC NHẬN] Đã đăng ký danh sách công cụ thành công!", flush=True)
+            print(">>> [XÁC NHẬN] Đã đăng ký danh sách công cụ với Robot!", flush=True)
 
-        # B. Xử lý yêu cầu gọi công cụ (call_tool hoặc method: tools/call)
+        # B. XỬ LÝ GỌI CÔNG CỤ (call_tool)
         elif data.get("type") == "call_tool" or method == "tools/call":
+            # Lấy tên tool và tham số (hỗ trợ cả 2 định dạng gói tin)
             tool_name = data.get("name") or data.get("params", {}).get("name")
             args = data.get("arguments") or data.get("params", {}).get("arguments") or {}
 
             print(f">>> [DISPATCHER] Robot gọi tool: {tool_name}", flush=True)
 
             if tool_name == "web_search":
-                res = tool_web_search(args.get("query"))
-                reply = {"type": "tool_result", "message_id": msg_id, "data": {"text": res}}
+                query = args.get("query")
+                result = tool_web_search(query)
+                reply = {"type": "tool_result", "message_id": msg_id, "data": {"text": result}}
                 ws.send(json.dumps(reply))
 
             elif tool_name == "play_music":
-                res = tool_play_music(args.get("query"))
+                query = args.get("query")
+                res = tool_play_music(query)
                 if isinstance(res, dict):
-                    reply = {"type": "tool_result", "message_id": msg_id, 
-                             "data": {"type": "audio", "url": res['url'], "text": f"Đang mở: {res['title']}"}}
+                    reply = {
+                        "type": "tool_result",
+                        "message_id": msg_id,
+                        "data": {
+                            "type": "audio",
+                            "url": res['url'],
+                            "text": f"Đang mở bài: {res['title']}"
+                        }
+                    }
                 else:
                     reply = {"type": "tool_result", "message_id": msg_id, "data": {"text": res}}
                 ws.send(json.dumps(reply))
