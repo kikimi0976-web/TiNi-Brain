@@ -46,6 +46,12 @@ def on_message(ws, message):
         method = data.get("method")
         msg_id = data.get("id") or data.get("message_id")
 
+        # 1. PHẢN HỒI PING (Sửa lỗi ngắt kết nối 30 giây)
+        if method == "ping":
+            ws.send(json.dumps({"id": msg_id, "jsonrpc": "2.0", "result": {}}))
+            print(">>> [PONG] Đã phản hồi nhịp đập của Robot!", flush=True)
+            return
+
         # 1. XỬ LÝ KHỞI TẠO - Bước quan trọng để sửa lỗi "Unknown tool"
         if method == "initialize":
             reply = {
