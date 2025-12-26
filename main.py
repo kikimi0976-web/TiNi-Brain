@@ -41,76 +41,56 @@ def tool_play_music(song_name):
 # --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ (MCP) ---
 def on_message(ws, message):
     try:
-        # In dữ liệu thô để theo dõi log thực tế
         print(f"\n[DỮ LIỆU NHẬN ĐƯỢC]: {message}", flush=True)
-        
         data = json.loads(message)
         method = data.get("method")
-        # Lấy đúng ID để phản hồi chính xác cho từng gói tin
         msg_id = data.get("id") if data.get("id") is not None else data.get("message_id")
 
-        # 1. PHẢN HỒI PING (GIỮ KẾT NỐI - CÓ PRINT ĐỂ BẠN THẤY)
+        # 1. PHẢN HỒI PING (GIỮ KẾT NỐI)
         if method == "ping":
             ws.send(json.dumps({"id": msg_id, "jsonrpc": "2.0", "result": {}}))
-            print(f">>> [PONG] Đã phản hồi nhịp đập cho gói ID: {msg_id}", flush=True)
+            print(f">>> [PONG] Đã phản hồi nhịp đập cho ID: {msg_id}", flush=True)
             return
 
-        # 2. PHẢN HỒI KHỞI TẠO (CHỈ KHAI BÁO KHẢ NĂNG)
+        # 2. PHẢN HỒI INITIALIZE (XÁC NHẬN GIAO THỨC)
         if method == "initialize":
-            reply = {
-                "id": msg_id,
-                "jsonrpc": "2.0",
-                "result": {
-                    "protocolVersion": "2024-11-05",
-                    "capabilities": {
-                        "tools": {} # Chỉ khai báo có hỗ trợ, Robot sẽ hỏi danh sách sau
-                    },
-                    "serverInfo": {"name": "Truman-Brain", "version": "1.0"}
-                }
-            }
+            reply = {"id": msg_id, "jsonrpc": "2.0", "result": {
+                "protocolVersion": "2024-11-05",
+                "capabilities": {"tools": {}}, # Khai báo có hỗ trợ công cụ
+                "serverInfo": {"name": "Truman-Brain", "version": "1.0"}
+            }}
             ws.send(json.dumps(reply))
-            print(f">>> [INIT OK] Đã xác nhận khởi tạo gói ID: {msg_id}", flush=True)
+            print(f">>> [INIT OK] Đã xác nhận khởi tạo cho ID: {msg_id}", flush=True)
             return
 
-        # 3. PHẢN HỒI DANH SÁCH TOOLS (BƯỚC QUYẾT ĐỊNH ĐỘ ỔN ĐỊNH)
+        # 3. PHẢN HỒI TOOLS/LIST (BẮT BUỘC PHẢI CÓ INPUTSCHEMA)
         if method == "tools/list":
-            reply = {
-                "id": msg_id,
-                "jsonrpc": "2.0",
-                "result": {
-                    "tools": [
-                        {"name": "web_search", "description": "Tìm kiếm tin tức trực tuyến"},
-                        {"name": "play_music", "description": "Tìm và phát nhạc YouTube"}
-                    ]
+            reply = {"id": msg_id, "jsonrpc": "2.0", "result": {"tools": [
+                {
+                    "name": "web_search",
+                    "description": "Tìm kiếm tin tức và thông tin trên internet",
+                    "inputSchema": { # AI dựa vào đây để biết cách đặt câu hỏi
+                        "type": "object",
+                        "properties": {"query": {"type": "string", "description": "Từ khóa tìm kiếm"}},
+                        "required": ["query"]
+                    }
+                },
+                {
+                    "name": "play_music",
+                    "description": "Tìm và phát nhạc từ YouTube",
+                    "inputSchema": {
+                        "type": "object",
+                        "properties": {"query": {"type": "string", "description": "Tên bài hát hoặc ca sĩ"}},
+                        "required": ["query"]
+                    }
                 }
-            }
+            ]}}
             ws.send(json.dumps(reply))
-            print(f">>> [LIST OK] Đã gửi danh sách công cụ cho gói ID: {msg_id}", flush=True)
+            print(f">>> [LIST OK] Đã gửi danh sách công cụ cho ID: {msg_id}", flush=True)
             return
 
-        # 4. XỬ LÝ GỌI CÔNG CỤ (CALL_TOOL)
-        if data.get("type") == "call_tool" or method == "tools/call":
-            params = data.get("params", {})
-            tool_name = data.get("name") or params.get("name")
-            args = data.get("arguments") or params.get("arguments") or {}
-            
-            print(f">>> [EXECUTING] Robot gọi tool: {tool_name}", flush=True)
+    except Exception as e: print(f"!! Lỗi xử lý: {str(e)}", flush=True)
 
-            if tool_name == "web_search":
-                res = tool_web_search(args.get("query"))
-                ws.send(json.dumps({"type": "tool_result", "message_id": msg_id, "data": {"text": res}}))
-            elif tool_name == "play_music":
-                res = tool_play_music(args.get("query"))
-                # Trả về link audio để Robot phát ngay
-                if isinstance(res, dict):
-                    ws.send(json.dumps({"type": "tool_result", "message_id": msg_id, 
-                                        "data": {"type": "audio", "url": res['url'], "text": f"Đang mở: {res['title']}"}}))
-                else:
-                    ws.send(json.dumps({"type": "tool_result", "message_id": msg_id, "data": {"text": res}}))
-
-    except Exception as e:
-        print(f"!! Lỗi xử lý lệnh: {str(e)}", flush=True)
-        
 def on_open(ws):
     # Chỉ in log để biết đã thông mạng, KHÔNG gửi gì thêm tại đây
     print(">>> ĐÃ MỞ KẾT NỐI. ĐỢI ROBOT GỬI LỆNH KHỞI TẠO...", flush=True)
@@ -119,8 +99,10 @@ def run_ws():
     while True:
         try:
             ws = websocket.WebSocketApp(MCP_ENDPOINT, on_open=on_open, on_message=on_message)
-            ws.run_forever()
-        except: time.sleep(5)
+            # Không đặt ping_interval/ping_timeout tại đây
+            ws.run_forever() 
+        except: 
+            time.sleep(10)
 
 @app.get("/")
 def health(): return {"status": "Online"}
