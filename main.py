@@ -49,18 +49,28 @@ def on_message(ws, message):
         msg_id = data.get("id") or data.get("message_id")
 
         # A. Xử lý yêu cầu khởi tạo (Initialize) - CỰC KỲ QUAN TRỌNG
+        # A. Xử lý yêu cầu khởi tạo (Initialize)
         if method == "initialize":
             reply = {
                 "id": msg_id,
                 "jsonrpc": "2.0",
                 "result": {
                     "protocolVersion": "2024-11-05",
-                    "capabilities": {"tools": {}},
+                    "capabilities": {
+                        "tools": {
+                            "listChanged": True,
+                            # KHAI BÁO CÔNG CỤ TẠI ĐÂY ĐỂ ROBOT NHẬN DIỆN
+                            "tools": [
+                                {"name": "web_search", "description": "Tìm kiếm tin tức trực tuyến"},
+                                {"name": "play_music", "description": "Phát nhạc từ YouTube"}
+                            ]
+                        }
+                    },
                     "serverInfo": {"name": "Truman-Brain", "version": "1.0"}
                 }
             }
             ws.send(json.dumps(reply))
-            print(">>> [XÁC NHẬN] Đã phản hồi gói tin khởi tạo!", flush=True)
+            print(">>> [XÁC NHẬN] Đã đăng ký danh sách công cụ thành công!", flush=True)
 
         # B. Xử lý yêu cầu gọi công cụ (call_tool hoặc method: tools/call)
         elif data.get("type") == "call_tool" or method == "tools/call":
