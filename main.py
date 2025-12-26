@@ -96,10 +96,16 @@ def on_open(ws):
 def run_ws():
     while True:
         try:
-            ws = websocket.WebSocketApp(MCP_ENDPOINT, on_open=on_open, on_message=on_message)
-            # Không đặt ping_interval/ping_timeout tại đây
-            ws.run_forever() 
-        except: 
+            ws = websocket.WebSocketApp(
+                MCP_ENDPOINT, 
+                on_open=on_open, 
+                on_message=on_message
+            )
+            # QUAN TRỌNG: Thêm ping_interval=30 để giữ kết nối trên Render
+            # Điều này sẽ gửi nhịp tim mỗi 30s, trước khi Render kịp ngắt ở 60s.
+            ws.run_forever(ping_interval=30, ping_timeout=10) 
+        except Exception as e:
+            print(f"!! Đang kết nối lại sau 10s do lỗi: {e}", flush=True)
             time.sleep(10)
 
 @app.get("/")
