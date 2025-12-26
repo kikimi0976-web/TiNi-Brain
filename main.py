@@ -98,3 +98,28 @@ async def startup(): threading.Thread(target=run_ws, daemon=True).start()
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)
+from duckduckgo_search import DDGS
+
+def tool_web_search(query):
+    """
+    Hàm thực hiện tra cứu thông tin trực tuyến.
+    """
+    print(f">>> [TRUMAN SEARCHING]: {query}", flush=True)
+    try:
+        with DDGS() as ddgs:
+            # Tra cứu văn bản với vùng tìm kiếm toàn cầu (wt-wt)
+            results = list(ddgs.text(query, region="wt-wt", max_results=3))
+            
+            if not results:
+                return "Không tìm thấy thông tin liên quan."
+            
+            # Gộp các tiêu đề và nội dung tóm tắt để gửi lại cho AI
+            summary = []
+            for r in results:
+                summary.append(f"Tiêu đề: {r['title']}\nNội dung: {r['body'][:200]}")
+            
+            return "\n---\n".join(summary)
+            
+    except Exception as e:
+        print(f"!! Lỗi khi tra cứu: {e}", flush=True)
+        return f"Xin lỗi, mình gặp trục trặc khi truy cập internet: {str(e)}"
