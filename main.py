@@ -123,3 +123,40 @@ def tool_web_search(query):
     except Exception as e:
         print(f"!! Lỗi khi tra cứu: {e}", flush=True)
         return f"Xin lỗi, mình gặp trục trặc khi truy cập internet: {str(e)}"
+
+import yt_dlp
+from duckduckgo_search import DDGS
+
+def tool_play_music(song_name):
+    """
+    Hàm trích xuất link nhạc stream trực tiếp từ YouTube.
+    """
+    print(f">>> [TRUMAN MUSIC]: Đang tìm bài: {song_name}", flush=True)
+    try:
+        # Bước 1: Tìm URL video qua DuckDuckGo Video
+        with DDGS() as ddgs:
+            # Thêm từ khóa 'audio' để lọc kết quả chất lượng tốt nhất
+            results = list(ddgs.videos(f"{song_name} audio", max_results=1))
+            if not results:
+                return "Xin lỗi, mình không tìm thấy bài hát này."
+            video_url = results[0]['content']
+
+        # Bước 2: Dùng yt-dlp để lấy stream URL trực tiếp
+        ydl_opts = {
+            'format': 'bestaudio/best', # Chỉ lấy phần âm thanh tốt nhất
+            'noplaylist': True,
+            'quiet': True,
+            'geo_bypass': True
+        }
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(video_url, download=False)
+            # Trả về URL stream để Robot có thể phát ngay
+            return {
+                "url": info['url'], 
+                "title": info.get('title', 'Music Stream'),
+                "type": "audio"
+            }
+            
+    except Exception as e:
+        print(f"!! Lỗi phát nhạc: {e}", flush=True)
+        return f"Gặp sự cố khi truy cập kho nhạc: {str(e)}"
