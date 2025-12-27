@@ -21,22 +21,27 @@ from duckduckgo_search import DDGS
 def tool_web_search(query):
     try:
         print(f">>> [DDG] Đang tìm kiếm: {query}", flush=True)
+        # Sử dụng thư viện DDGS mới nhất
         with DDGS() as ddgs:
-            # Sử dụng max_results=5 để tăng tỷ lệ có dữ liệu
-            results = list(ddgs.text(query, max_results=5))
+            # Sửa đổi: Thêm tham số keywords= và lọc kết quả
+            results = [r for r in ddgs.text(keywords=query, max_results=5)]
             
             if not results:
-                return "Không tìm thấy kết quả phù hợp trên Internet."
+                print(">>> [DDG] Không tìm thấy kết quả nào.", flush=True)
+                return "Không tìm thấy tin tức mới nhất về chủ đề này."
             
-            # Gộp các kết quả lại thành đoạn văn
-            search_data = []
+            # Trích xuất dữ liệu thô để Robot xử lý
+            search_content = []
             for r in results:
-                search_data.append(f"{r['title']}: {r['body']}")
+                search_content.append(f"Tiêu đề: {r['title']}\nNội dung: {r['body']}")
             
-            return " . ".join(search_data)[:2000] # Giới hạn độ dài để Robot dễ đọc
+            full_res = "\n---\n".join(search_content)
+            print(f">>> [DDG] Tìm thấy {len(results)} kết quả.", flush=True)
+            return full_res
+            
     except Exception as e:
-        print(f"!! Lỗi tìm kiếm: {str(e)}", flush=True)
-        return "Xin lỗi, hiện tại tôi không thể truy cập dữ liệu tìm kiếm."
+        print(f"!! Lỗi DDG: {str(e)}", flush=True)
+        return "Hiện tại không thể truy cập dịch vụ tìm kiếm."
 
 def tool_play_music(song_name):
     print(f">>> [TRUMAN MUSIC]: {song_name}", flush=True)
