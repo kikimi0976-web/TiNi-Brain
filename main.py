@@ -85,6 +85,33 @@ def on_message(ws, message):
             ws.send(json.dumps(reply))
             print(f">>> [LIST OK] Đã gửi danh sách cho ID: {msg_id}", flush=True)
             return
+        # 5. XỬ LÝ GỌI CÔNG CỤ (THÊM MỚI ĐỂ PHẢN HỒI ID)
+        if method == "tools/call":
+            params = data.get("params", {})
+            tool_name = params.get("name")
+            args = params.get("arguments", {})
+            query = args.get("query")
+            
+            print(f">>> [DETECTED] Robot gọi tool: {tool_name} -> '{query}'", flush=True)
+
+            res_text = ""
+            if tool_name == "web_search":
+                res_text = tool_web_search(query)
+            elif tool_name == "play_music":
+                res_music = tool_play_music(query)
+                res_text = f"Đang mở nhạc: {res_music['title']}" if isinstance(res_music, dict) else res_music
+
+            # PHẢN HỒI KẾT QUẢ THEO CHUẨN JSON-RPC
+            response = {
+                "jsonrpc": "2.0",
+                "id": msg_id,  # Trả về đúng ID: 498 của Robot
+                "result": {
+                    "content": [{"type": "text", "text": res_text}]
+                }
+            }
+            ws.send(json.dumps(response))
+            print(f">>> [SUCCESS] Đã gửi kết quả cho gói ID: {msg_id}", flush=True)
+            return
 
     except Exception as e:
         print(f"!! Lỗi: {str(e)}", flush=True)
