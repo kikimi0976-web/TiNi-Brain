@@ -1,4 +1,4 @@
-ddgs>=6.0.0
+duckduckgo-search>=6.0.0
 yt-dlp
 websocket-client
 fastapi
