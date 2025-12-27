@@ -52,7 +52,7 @@ def tool_play_music(song_name):
     except Exception as e:
         return f"Lỗi âm nhạc: {str(e)}"
 
-# --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ (MCP) ---
+# --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ trong (MCP) ---
 def on_message(ws, message):
     try:
         print(f"\n[DỮ LIỆU NHẬN ĐƯỢC]: {message}", flush=True)
