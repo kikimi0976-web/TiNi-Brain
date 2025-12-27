@@ -1,5 +1,5 @@
 ddgs>=6.0.0
-yt-dlp
+yt-dlp>=2025.1.0  # Đảm bảo phiên bản mới nhất năm 2025
 websocket-client
 fastapi
 uvicorn
