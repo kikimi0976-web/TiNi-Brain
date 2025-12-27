@@ -14,15 +14,29 @@ app = FastAPI()
 MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NzczNDUyLCJleHAiOjE3OTgzMzEwNTJ9.yVZ6Pi7ojLVQQ5UYwDyLkC-YUhIfb2_GuJf1uw4a6_ZD3FUQfkZpBriYT1BGykACxLeZ8NOMq4Sx3Ann2oLWiw"
 
 # --- [TOOLS] CÁC GIÁC QUAN ---
+# 1. Thay đổi dòng import ở đầu file
+from duckduckgo_search import DDGS 
+
+# 2. Cập nhật lại hàm tìm kiếm
 def tool_web_search(query):
-    print(f">>> [TRUMAN SEARCHING]: {query}", flush=True)
     try:
+        print(f">>> [DDG] Đang tìm kiếm: {query}", flush=True)
         with DDGS() as ddgs:
-            results = list(ddgs.text(query, region="wt-wt", max_results=3))
-            if not results: return "Không tìm thấy thông tin mới nhất."
-            return " . ".join([f"{r['title']}: {r['body'][:200]}" for r in results])
+            # Sử dụng max_results=5 để tăng tỷ lệ có dữ liệu
+            results = list(ddgs.text(query, max_results=5))
+            
+            if not results:
+                return "Không tìm thấy kết quả phù hợp trên Internet."
+            
+            # Gộp các kết quả lại thành đoạn văn
+            search_data = []
+            for r in results:
+                search_data.append(f"{r['title']}: {r['body']}")
+            
+            return " . ".join(search_data)[:2000] # Giới hạn độ dài để Robot dễ đọc
     except Exception as e:
-        return f"Lỗi internet: {str(e)}"
+        print(f"!! Lỗi tìm kiếm: {str(e)}", flush=True)
+        return "Xin lỗi, hiện tại tôi không thể truy cập dữ liệu tìm kiếm."
 
 def tool_play_music(song_name):
     print(f">>> [TRUMAN MUSIC]: {song_name}", flush=True)
