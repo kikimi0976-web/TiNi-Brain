@@ -5,7 +5,7 @@ import time
 import os
 from fastapi import FastAPI
 import uvicorn
-from duckduckgo_search import DDGS
+from ddgs import DDGS
 import yt_dlp
 
 app = FastAPI()
@@ -15,7 +15,7 @@ MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpX
 
 # --- [TOOLS] CÁC GIÁC QUAN ---
 # 1. Thay đổi dòng import ở đầu file
-from duckduckgo_search import DDGS 
+from ddgs import DDGS 
 
 # 2. Cập nhật lại hàm tìm kiếm
 def tool_web_search(query):
