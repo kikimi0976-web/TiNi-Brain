@@ -1,5 +1,5 @@
+ddgs>=6.0.0
+yt-dlp
+websocket-client
 fastapi
 uvicorn
-websocket-client
-yt-dlp
-duckduckgo-search
