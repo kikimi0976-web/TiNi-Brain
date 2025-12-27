@@ -21,27 +21,26 @@ from ddgs import DDGS
 def tool_web_search(query):
     try:
         print(f">>> [DDG] Đang tìm kiếm: {query}", flush=True)
-        # Sử dụng thư viện DDGS mới nhất
         with DDGS() as ddgs:
-            # Sửa đổi: Thêm tham số keywords= và lọc kết quả
-            results = [r for r in ddgs.text(keywords=query, max_results=5)]
+            # FIX: Truyền trực tiếp 'query' vào hàm text() 
+            # thay vì dùng keywords=query
+            results = [r for r in ddgs.text(query, max_results=5)]
             
             if not results:
-                print(">>> [DDG] Không tìm thấy kết quả nào.", flush=True)
-                return "Không tìm thấy tin tức mới nhất về chủ đề này."
+                print(">>> [DDG] Không tìm thấy kết quả.", flush=True)
+                return "Không tìm thấy thông tin phù hợp trên Internet."
             
-            # Trích xuất dữ liệu thô để Robot xử lý
+            # Gộp kết quả
             search_content = []
             for r in results:
                 search_content.append(f"Tiêu đề: {r['title']}\nNội dung: {r['body']}")
             
-            full_res = "\n---\n".join(search_content)
             print(f">>> [DDG] Tìm thấy {len(results)} kết quả.", flush=True)
-            return full_res
+            return "\n---\n".join(search_content)
             
     except Exception as e:
         print(f"!! Lỗi DDG: {str(e)}", flush=True)
-        return "Hiện tại không thể truy cập dịch vụ tìm kiếm."
+        return "Hiện tại hệ thống tìm kiếm đang gặp sự cố kỹ thuật."
 
 #xử lí nhạc
 def tool_play_music(song_name):
