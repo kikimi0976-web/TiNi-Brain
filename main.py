@@ -44,18 +44,31 @@ def tool_web_search(query):
 
 #xử lí nhạc
 def tool_play_music(song_name):
-    print(f">>> [TRUMAN MUSIC]: {song_name}", flush=True)
     try:
+        print(f">>> [MUSIC] Đang tìm kiếm bài hát: {song_name}", flush=True)
         with DDGS() as ddgs:
-            results = list(ddgs.videos(f"{song_name} audio", max_results=1))
-            if not results: return "Không tìm thấy bài hát."
-            video_url = results[0]['content']
-        ydl_opts = {'format': 'bestaudio/best', 'quiet': True, 'noplaylist': True}
+            # Tìm kiếm video trên YouTube thông qua DuckDuckGo
+            video_url = list(ddgs.videos(f"{song_name} audio", max_results=1))[0]['content']
+            
+        # Cấu hình yt-dlp để vượt qua bot detection
+        ydl_opts = {
+            'format': 'bestaudio/best',
+            'quiet': True,
+            'cookiefile': 'cookies.txt', # QUAN TRỌNG: Chỉ định tệp cookies bạn vừa tạo
+            'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+        }
+        
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(video_url, download=False)
-            return {"url": info['url'], "title": info['title']}
+            audio_url = info['url']
+            title = info['title']
+            
+            print(f">>> [SUCCESS] Đã lấy được link nhạc: {title}", flush=True)
+            return {"url": audio_url, "title": title}
+            
     except Exception as e:
-        return f"Lỗi âm nhạc: {str(e)}"
+        print(f"!! Lỗi phát nhạc: {str(e)}", flush=True)
+        return "Xin lỗi, tôi gặp khó khăn khi truy cập kho nhạc của YouTube."
 
 # --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ trong (MCP) ---
 def on_message(ws, message):
