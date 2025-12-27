@@ -43,6 +43,7 @@ def tool_web_search(query):
         print(f"!! Lỗi DDG: {str(e)}", flush=True)
         return "Hiện tại không thể truy cập dịch vụ tìm kiếm."
 
+#xử lí nhạc
 def tool_play_music(song_name):
     print(f">>> [TRUMAN MUSIC]: {song_name}", flush=True)
     try:
