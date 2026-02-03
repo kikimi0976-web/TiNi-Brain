@@ -3,3 +3,7 @@ yt-dlp>=2025.1.0  # Đảm bảo phiên bản mới nhất năm 2025
 websocket-client
 fastapi
 uvicorn
+# Optional: timezone support on older Python or systems without tz data
+# You can install one or both if you need timezone conversions:
+# pytz>=2023.3
+# tzdata

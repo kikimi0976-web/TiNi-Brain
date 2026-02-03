@@ -11,7 +11,7 @@ import yt_dlp
 app = FastAPI()
 
 # URL kết nối từ phía Robot (Hãy đảm bảo Token còn hạn)
-MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzY2NzczNDUyLCJleHAiOjE3OTgzMzEwNTJ9.yVZ6Pi7ojLVQQ5UYwDyLkC-YUhIfb2_GuJf1uw4a6_ZD3FUQfkZpBriYT1BGykACxLeZ8NOMq4Sx3Ann2oLWiw"
+MCP_ENDPOINT = "wss://api.xiaozhi.me/mcp/?token=eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjczNTUwNywiYWdlbnRJZCI6MTI1MDY3MCwiZW5kcG9pbnRJZCI6ImFnZW50XzEyNTA2NzAiLCJwdXJwb3NlIjoibWNwLWVuZHBvaW50IiwiaWF0IjoxNzcwMTI4ODYxLCJleHAiOjE4MDE2ODY0NjF9._ltZLmO23NaBTCx3oMo7yZ60HHZd12HgTih_FApScRucLkEb2wt7aamg-AL76I2LHYQ3qc74p_20ptwKN29vAA"
 
 # --- [TOOLS] CÁC GIÁC QUAN ---
 # 1. Thay đổi dòng import ở đầu file
