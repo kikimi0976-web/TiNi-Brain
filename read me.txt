@@ -1,0 +1,23 @@
+rebuild MCP
+1. access xiaozhi ai to get token by: agents->configure role->mcp setting->get mcp endpoint
+2. open main.py in C:\Users\Kieu Minh\Documents\study\TiNibrain
+3. paste the token in point : MCP_ENDPOINT = "token"
+4. git push by cmd 
+	- C:\Users\Kieu Minh\Documents\study\TiNibrain -> type "cmd"
+	- type "git add ."
+	- type "git commit -m "cap nhat toi uu +time " "
+	- type "git push"
+5. delete old project and create new web service on render
+	-region: Singapore
+	-start command: python main.py
+6. after successful, go uptimerobot and create monitor
+	-type:HTTP
+	-link: after the line "Available at your primary URL"
+udate or repair 
+1.edit main.py
+2.git push
+	-run terminal in C:\Users\Kieu Minh\Documents\study\TiNibrain
+	-git add .
+	-git commit -m "cap nhat toi uu +time"
+	-git push
+Done!

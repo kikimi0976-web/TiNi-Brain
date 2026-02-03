@@ -43,32 +43,39 @@ def tool_web_search(query):
         return "Hiện tại hệ thống tìm kiếm đang gặp sự cố kỹ thuật."
 
 #xử lí nhạc
+# --- [TOOL 2] PHÁT NHẠC (SoundCloud - Đã bỏ Cookie) ---
 def tool_play_music(song_name):
     try:
-        print(f">>> [MUSIC] Đang tìm kiếm bài hát: {song_name}", flush=True)
-        with DDGS() as ddgs:
-            # Tìm kiếm video trên YouTube thông qua DuckDuckGo
-            video_url = list(ddgs.videos(f"{song_name} audio", max_results=1))[0]['content']
-            
-        # Cấu hình yt-dlp để vượt qua bot detection
+        print(f">>> [MUSIC] Đang tìm trên SoundCloud: {song_name}", flush=True)
+        
+        # Cấu hình tối ưu cho SoundCloud (Không cần file cookies.txt nữa)
         ydl_opts = {
             'format': 'bestaudio/best',
+            'default_search': 'scsearch', # Chế độ tìm kiếm của SoundCloud
+            'noplaylist': True,
             'quiet': True,
-            'cookiefile': 'cookies.txt', # QUAN TRỌNG: Chỉ định tệp cookies bạn vừa tạo
+            # Bộ lọc: Chỉ lấy bài hát dài từ 1 phút (60s) đến 10 phút (600s)
+            'match_filter': yt_dlp.utils.match_filter_func("duration > 60 & duration < 600"),
             'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
         }
         
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-            info = ydl.extract_info(video_url, download=False)
+            # scsearch1 nghĩa là tìm và lấy kết quả đầu tiên
+            info = ydl.extract_info(f"scsearch1:{song_name}", download=False)
+            
+            # Xử lý kết quả trả về từ tìm kiếm
+            if 'entries' in info:
+                info = info['entries'][0]
+
             audio_url = info['url']
             title = info['title']
             
-            print(f">>> [SUCCESS] Đã lấy được link nhạc: {title}", flush=True)
-            return {"url": audio_url, "title": title}
+            print(f">>> [FOUND] Bài hát: {title}", flush=True)
+            return {"url": audio_url, "title": f"{title} (SoundCloud)"}
             
     except Exception as e:
-        print(f"!! Lỗi phát nhạc: {str(e)}", flush=True)
-        return "Xin lỗi, tôi gặp khó khăn khi truy cập kho nhạc của YouTube."
+        print(f"!! Lỗi Music: {e}", flush=True)
+        return "Không tìm thấy bài hát phù hợp trên SoundCloud."
 
 # --- [CORE] ĐIỀU PHỐI VÀ ĐĂNG KÝ CÔNG CỤ trong (MCP) ---
 def on_message(ws, message):
